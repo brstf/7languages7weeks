@@ -1,39 +1,7 @@
-% 4x4 Sudoku:
+%---------------------------------------------------------%
+%  Full 9x9 Sudoku                                        %
+%---------------------------------------------------------%
 sudoku(Puzzle, Solution) :-
-    % Make sure puzzle and solution unify:
-    Solution = Puzzle,
-    % Unify the format of the puzzle:
-    Puzzle = [S11, S12, S13, S14,
-              S21, S22, S23, S24,
-              S31, S32, S33, S34,
-              S41, S42, S43, S44],
-    % Ensure all of our elements are within 1-4:
-    fd_domain(Solution, 1, 4),
-    % Unify the rows, columns, and squares
-    Row1 = [S11, S12, S13, S14],
-    Row2 = [S21, S22, S23, S24],
-    Row3 = [S31, S32, S33, S34],
-    Row4 = [S41, S42, S43, S44],
-    Col1 = [S11, S21, S31, S41],
-    Col2 = [S12, S22, S32, S42],
-    Col3 = [S13, S23, S33, S43],
-    Col4 = [S14, S24, S34, S44],
-    Sqa1 = [S11, S12, S21, S22],
-    Sqa2 = [S13, S14, S23, S24],
-    Sqa3 = [S31, S32, S41, S42],
-    Sqa4 = [S33, S34, S43, S44],
-    % Validate all rows, columns, and squares:
-    valid([
-         Row1, Row2, Row3, Row4,
-         Col1, Col2, Col3, Col4,
-         Sqa1, Sqa2, Sqa3, Sqa4
-         ]).
- 
-valid([]).
-valid([Head | Tail]) :- fd_all_different(Head), valid(Tail).
-
-% Full 9x9 Sudoku:
-sudoku9(Puzzle, Solution) :-
     % Make sure puzzle and solution unify
     Solution = Puzzle,
     % Unify the format of the puzzle:
@@ -94,3 +62,48 @@ sudoku9(Puzzle, Solution) :-
     format('%d %d %d %d %d %d %d %d %d\n', Row7),
     format('%d %d %d %d %d %d %d %d %d\n', Row8),
     format('%d %d %d %d %d %d %d %d %d\n', Row9).
+
+valid([]).
+valid([Head | Tail]) :- fd_all_different(Head), valid(Tail).
+
+
+%---------------------------------------------------------%
+%  Eight Queens Problem:                                  %
+%---------------------------------------------------------%
+
+% Valid board check, ensures range and uniqueness. This
+% lets us avoid a third call to fd_all_different later
+valid_board([], []).
+valid_board([Col|Tail], Valid) :- 
+    member(Col, Valid),
+    delete(Valid, Col, NValid),
+    valid_board(Tail, NValid).
+
+% Get the diagonal lists. First variable is the Row, starts
+% at 1 and increases to represent the index of the list. I'm
+% not sure if keeping track of it this way is optimal
+diags1(_, [], []).
+diags1(Row, [Col|Tail], [Diagonal|DiagonalsTail]) :-
+    Diagonal is Col - Row,
+    NRow is Row + 1,
+    d1(NRow, Tail, DiagonalsTail).
+
+diags2(_, [], []).
+diags2(Row, [Col|Tail], [Diagonal|DiagonalsTail]) :-
+    Diagonal is Col + Row,
+    NRow is Row + 1,
+    d2(NRow, Tail, DiagonalsTail).
+
+eight_queens(Board) :-
+    % 8 Queens on the board
+    length(Board, 8),
+    valid_board(Board, [1,2,3,4,5,6,7,8]),
+
+    % Get the list of diagonals to check
+    diags1(1, Board, Diags1),
+    diags2(1, Board, Diags2),
+
+    % We know rows and columns are different, so just
+    % check diagonasl
+    fd_all_different(Diags1),
+    fd_all_different(Diags2).
