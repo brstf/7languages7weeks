@@ -38,4 +38,16 @@ It also handles general MxN puzzles, like the following:
       X   X   
 
 
-I'm not positive that this is well optimized, but it works on all test cases I've tried.
+I'm not positive that this is well optimized, but it works on all test cases I've tried. It runs fairly slowly on large sized puzzles, but it solves smaller ones in a reasonable amount of time:
+
+    | ?- picross([[1],[2,1],[5,1],[4],[2,3],[4,1],[2,4],[1,2]],[[2],[1,4],[2,2],[3,2],[2,2],[4,2],[4],[3]],Board).
+
+              X X   
+        X   X X X X 
+      X X   X X     
+    X X X     X X   
+        X X     X X 
+      X X X X   X X 
+          X X X X   
+        X X X       
+
