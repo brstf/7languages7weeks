@@ -60,3 +60,58 @@ module Main where
 
     addNewline :: [Char] -> [Char]
     addNewline = (++"\n")
+
+    -- Extra problems:
+    -- Write a function to determine the greatest common denominator of two 
+    -- integers
+    -- Euclid's algorithm:
+    euclid :: Integer -> Integer -> Integer
+    euclid a 0 = a
+    euclid a b = euclid b (mod a b)
+
+    -- Create a lazy sequence of prime numbers
+    -- Sieve of Eratosthenes
+    primes :: [Integer]
+    primes = sieve [2..]
+
+    sieve :: [Integer] -> [Integer]
+    sieve (h : t) = h : sieve [x | x <- t, (mod x h) /= 0]
+
+    -- Break a long string into individual lines at proper word boundaries
+    -- I assume this is just splitting a string into indivdual words?
+    longsplit :: [Char] -> [[Char]]
+    longsplit text = wordsplit 0 text text
+
+    -- This doesn't take into account other whitespace characters like newlines,
+    -- tabs, etc., and we cannot preserve old spacing (like "hello     world") if
+    -- that's important.  Also, we could just use Data.Text words to do this
+    wordsplit :: Int -> [Char] -> [Char] -> [[Char]]
+    wordsplit 0 [] ref = []
+    wordsplit n [] ref = [take n ref]
+    wordsplit 0 (' ':remt) ref = wordsplit 0 remt (drop 1 ref)
+    wordsplit n (' ':remt) ref = (take n ref):(wordsplit 0 remt (drop (n + 1) ref))
+    wordsplit n (remh:remt) ref = wordsplit (n + 1) remt ref
+
+    -- Add line numbers to the previous exercise
+    linenumsplit :: [Char] -> [[Char]]
+    linenumsplit text = addnums (wordsplit 0 text text)
+
+    addnums :: [[Char]] ->[[Char]]
+    addnums wl = map (\(x, w) -> show x ++ w) (zip (take (length wl) [1..]) wl)
+
+    -- Add functions to left justify / right justify
+    leftjust :: [[Char]] -> [Char]
+    leftjust wl = join (addspacepost wl (maximum (map (\w -> length w) wl))) '\n'
+
+    rightjust :: [[Char]] -> [Char]
+    rightjust wl = join (map (\w -> reverse w) (addspacepost (map (\w -> reverse w) wl) (maximum(map (\w -> length w) wl)))) '\n'
+
+    addspacepost :: [[Char]] -> Int -> [[Char]]
+    addspacepost wl n = map (\w -> w ++ (take (n - length w) (repeat ' '))) wl
+
+    -- Helper function to combine the word lists into a string joined with
+    -- newlines or some other whitespace
+    join :: [[Char]] -> Char -> [Char]
+    join [] jc = []
+    join ([]:t) jc = jc:join t jc
+    join ((wh:wt):t) jc = wh:join (wt:t) jc
